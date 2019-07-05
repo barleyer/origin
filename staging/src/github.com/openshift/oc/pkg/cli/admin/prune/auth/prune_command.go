@@ -135,6 +135,10 @@ func (o *PruneAuthOptions) RunPrune() error {
 		case isUser(info.Mapping):
 			reapForUser(o.UserClient, o.AuthorizationClient, o.OAuthClient, o.SecurityClient.SecurityContextConstraints(), info.Name, o.Out)
 
+    // paremetes need to be adjusted.  
+		case isServiceAccount(info.Mapping):
+			reapForServiceAccount(o.AuthorizationClient, info.Namespace, info.Name, o.Out)
+
 		case isGroup(info.Mapping):
 			reapForGroup(o.AuthorizationClient, o.SecurityClient.SecurityContextConstraints(), info.Name, o.Out)
 		}
@@ -167,6 +171,13 @@ func isClusterRole(mapping *meta.RESTMapping) bool {
 
 func isUser(mapping *meta.RESTMapping) bool {
 	if mapping.Resource.Group == "user.openshift.io" && mapping.Resource.Resource == "users" {
+		return true
+	}
+	return false
+}
+
+func isServiceAccount(mapping *meta.RESTMapping) bool {
+	if mapping.Resource.Resource == "serviceaccounts" {
 		return true
 	}
 	return false
